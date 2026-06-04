@@ -8,10 +8,10 @@ Data is hosted on GitHub and can be fetched directly as a JSON file.
 
 ## new Endpoint (Live server) restful
 [json](https://coats.zdislav.dpdns.org/api/items)
+[web site](https://coats.zdislav.dpdns.org/)
 
 ## API Endpoint (github) rest
 [json](https://raw.githubusercontent.com/stuffbymax/coats/refs/heads/main/db.json)
 
-[web site](https://coats.zdislav.dpdns.org/)
 ## examples 
 > do to me changing the JSON structure i need to make new examples
