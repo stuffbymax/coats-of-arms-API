@@ -1,4 +1,4 @@
-# CSS made by AI
+# CSS and HTML made by AI
 # Coats of Arms API repository — Flask + SQLite
 # the project
 [https://coats.zdislav.dpdns.org/](https://coats.zdislav.dpdns.org/)
