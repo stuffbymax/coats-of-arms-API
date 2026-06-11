@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Add Entry — coats{% endblock %}
+{% block content %}
+
+<div style="margin: 2rem 0 1rem;">
+    <a href="/" class="btn btn-outline" style="font-size:0.7rem">← Back to Collection</a>
+</div>
+
+<h1 class="page-title">New Entry</h1>
+<p class="page-subtitle">Add a coat of arms to the collection</p>
+
+<div class="form-card">
+    <form method="POST" action="/add">
+
+        <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Edinburgh">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div class="form-group">
+                <label>Motto (Latin)</label>
+                <input type="text" name="motto_latin" placeholder="Labor omnia vincit">
+            </div>
+            <div class="form-group">
+                <label>Motto (English)</label>
+                <input type="text" name="motto_english" placeholder="Work conquers all">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Colors <span style="opacity:0.5;font-size:0.65rem">(comma-separated)</span></label>
+            <input type="text" name="colors" placeholder="Azure, Argent, Gules">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div class="form-group">
+                <label>Shield Shape</label>
+                <input type="text" name="shield_shape" placeholder="heater, round, lozenge…">
+            </div>
+            <div class="form-group">
+                <label>Founded / Created</label>
+                <input type="text" name="created_at" placeholder="1381, 15th century…">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Designer</label>
+            <input type="text" name="designer" placeholder="Traditional / Unknown / Name">
+        </div>
+
+        <div class="form-group">
+            <label>Image URL</label>
+            <input type="url" name="image" placeholder="https://…">
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" placeholder="Describe the coat of arms…"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Official Usage</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="usage_official_documents" value="1"> Official Documents</label>
+                <label><input type="checkbox" name="usage_flags" value="1"> Flags</label>
+                <label><input type="checkbox" name="usage_seal" value="1"> Seal</label>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <div style="display:flex;gap:0.75rem">
+            <button type="submit" class="btn btn-gold">Save Entry</button>
+            <a href="/" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

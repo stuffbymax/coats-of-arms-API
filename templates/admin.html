@@ -1,0 +1,793 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel — Coats of Arms{% endblock %}
+{% block content %}
+
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Coats of Arms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a6530;
+    --crimson: #8b1a1a;
+    --crimson-light: #b52828;
+    --bg: #0d0d0f;
+    --surface: #13131a;
+    --surface2: #1a1a24;
+    --surface3: #22222f;
+    --border: #2a2a3a;
+    --border-gold: rgba(201,168,76,0.25);
+    --text: #e8e0d0;
+    --text-dim: #7a7065;
+    --text-muted: #4a4540;
+    --success: #3a7a4a;
+    --danger: #7a1a1a;
+    --danger-light: #b52828;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.04) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(201,168,76,0.015) 40px, rgba(201,168,76,0.015) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(201,168,76,0.015) 40px, rgba(201,168,76,0.015) 41px);
+  }
+
+  /* ─── Top Bar ─── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,15,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-gold);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 60px;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .topbar-brand .crest {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  .topbar-brand h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .topbar-brand span {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 1px;
+  }
+  .topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .topbar-nav a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .topbar-nav a:hover { color: var(--gold); border-color: var(--border-gold); }
+  .topbar-nav a.danger { color: var(--crimson-light); }
+  .topbar-nav a.danger:hover { border-color: var(--crimson-light); }
+
+  /* ─── Layout ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 2rem 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+  .sidebar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 0 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.5rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+  .sidebar-link:hover, .sidebar-link.active {
+    color: var(--text);
+    background: rgba(201,168,76,0.05);
+    border-left-color: var(--gold);
+  }
+  .sidebar-link .icon { font-size: 0.9rem; width: 18px; text-align: center; }
+
+  /* ─── Main content ─── */
+  .main {
+    padding: 2.5rem;
+    overflow-x: hidden;
+  }
+
+  /* ─── Panels (tabs) ─── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ─── Page header ─── */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+  }
+  .page-header p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+  }
+
+  /* ─── Stats cards ─── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--gold-dim);
+    padding: 1.5rem;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+  }
+  .stat-card .number {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-card .label {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+  }
+
+  /* ─── Table ─── */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .table-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .search-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.4rem 0.8rem;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.9rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 220px;
+  }
+  .search-box:focus { border-color: var(--gold-dim); }
+  .search-box::placeholder { color: var(--text-muted); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead { background: var(--surface3); }
+  th {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 0.7rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(201,168,76,0.03); }
+
+  /* ─── Badges ─── */
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 2px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .badge-gold { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid var(--border-gold); }
+  .badge-dim { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border); }
+  .badge-red { background: rgba(139,26,26,0.2); color: #e05555; border: 1px solid rgba(139,26,26,0.4); }
+  .badge-green { background: rgba(58,122,74,0.2); color: #5ac97a; border: 1px solid rgba(58,122,74,0.4); }
+
+  /* ─── Action buttons ─── */
+  .btn-row { display: flex; gap: 0.4rem; align-items: center; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.65rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid;
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    background: transparent;
+    white-space: nowrap;
+  }
+  .btn-gold { color: var(--gold); border-color: var(--gold-dim); }
+  .btn-gold:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+  .btn-red { color: #e05555; border-color: rgba(139,26,26,0.5); }
+  .btn-red:hover { background: rgba(139,26,26,0.15); border-color: #e05555; }
+  .btn-green { color: #5ac97a; border-color: rgba(58,122,74,0.5); }
+  .btn-green:hover { background: rgba(58,122,74,0.15); border-color: #5ac97a; }
+  .btn-blue { color: #5a9fd4; border-color: rgba(58,100,180,0.4); }
+  .btn-blue:hover { background: rgba(58,100,180,0.1); border-color: #5a9fd4; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color: var(--bg);
+    border-color: var(--gold);
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.7rem;
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+
+  /* ─── Form ─── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2rem;
+    max-width: 700px;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+  .form-group.full { grid-column: 1 / -1; }
+  label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+  input[type=text], input[type=date], select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.55rem 0.75rem;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold-dim); }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: var(--surface2); }
+  .checkbox-row { display: flex; gap: 1.5rem; margin-top: 0.3rem; }
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: 'Crimson Pro', serif;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  input[type=checkbox] { accent-color: var(--gold); width: 14px; height: 14px; }
+  .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  /* ─── Inline form (confirm deletes) ─── */
+  .inline-form { display: inline; }
+  .truncate { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+
+  /* ─── API key display ─── */
+  .api-key-cell {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ─── Empty state ─── */
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  /* ─── Flash / alert ─── */
+  .alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    border-left: 3px solid;
+  }
+  .alert-success { background: rgba(58,122,74,0.1); border-color: #5ac97a; color: #5ac97a; }
+  .alert-error { background: rgba(139,26,26,0.1); border-color: #e05555; color: #e05555; }
+
+  /* ─── Divider ─── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  /* ─── Section spacing ─── */
+  .section { margin-bottom: 2.5rem; }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="crest">⚜</span>
+    <div>
+      <h1>Armorium</h1>
+      <span>Admin Sanctum</span>
+    </div>
+  </div>
+  <nav class="topbar-nav">
+    <span style="font-family:'Cinzel',serif;font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;">
+      ✦ {{ g.user.username }}
+    </span>
+    <a href="{{ url_for('index') }}">← Site</a>
+    <a href="{{ url_for('logout') }}" class="danger">Logout</a>
+  </nav>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <a class="sidebar-link active" onclick="showPanel('overview')" id="nav-overview">
+        <span class="icon">◈</span> Overview
+      </a>
+      <a class="sidebar-link" onclick="showPanel('items')" id="nav-items">
+        <span class="icon">🛡</span> Items
+      </a>
+      <a class="sidebar-link" onclick="showPanel('users')" id="nav-users">
+        <span class="icon">⚔</span> Users
+      </a>
+      <a class="sidebar-link" onclick="showPanel('add-item')" id="nav-add-item">
+        <span class="icon">✦</span> Add Item
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Info</div>
+      <div style="padding:0 1.5rem;font-size:0.8rem;color:var(--text-muted);line-height:1.8;">
+        <div>Items: <strong style="color:var(--gold)">{{ stats.total_items }}</strong></div>
+        <div>Users: <strong style="color:var(--gold)">{{ stats.total_users }}</strong></div>
+        <div>Admins: <strong style="color:var(--gold)">{{ stats.admin_count }}</strong></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="panel active" id="panel-overview">
+      <div class="page-header">
+        <div>
+          <h2>Overview</h2>
+          <p>Welcome to the administrative sanctum, {{ g.user.username }}.</p>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="number">{{ stats.total_items }}</div>
+          <div class="label">Total Items</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">{{ stats.total_users }}</div>
+          <div class="label">Registered Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">{{ stats.admin_count }}</div>
+          <div class="label">Administrators</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Recent Items</span>
+          <a class="btn btn-gold" onclick="showPanel('items')">View All →</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Owner</th><th>Shield</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in items[:8] %}
+              <tr>
+                <td style="color:var(--text-muted);font-family:monospace;font-size:0.8rem;">#{{ item.id }}</td>
+                <td><span class="truncate">{{ item.name }}</span></td>
+                <td>{{ item.owner_name or '—' }}</td>
+                <td><span class="badge badge-dim">{{ item.shield_shape or '—' }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="empty">No items yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ITEMS ── -->
+    <div class="panel" id="panel-items">
+      <div class="page-header">
+        <div>
+          <h2>All Items</h2>
+          <p>Manage every coat of arms in the registry.</p>
+        </div>
+        <a class="btn btn-primary" onclick="showPanel('add-item')">✦ Add Item</a>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <span class="table-title">⚜ Registry — {{ items|length }} records</span>
+          <input class="search-box" type="text" placeholder="Filter items..." oninput="filterTable(this,'items-tbody')">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Name</th><th>Owner</th><th>Motto</th><th>Shield</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="items-tbody">
+            {% for item in items %}
+            <tr>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:0.8rem;">#{{ item.id }}</td>
+              <td><span class="truncate" style="max-width:180px;">{{ item.name }}</span></td>
+              <td>
+                {% if item.owner_name %}
+                  <span class="badge badge-dim">{{ item.owner_name }}</span>
+                {% else %}
+                  <span style="color:var(--text-muted)">—</span>
+                {% endif %}
+              </td>
+              <td style="color:var(--text-dim);font-style:italic;font-size:0.85rem;">
+                <span class="truncate" style="max-width:160px;">{{ item.motto_latin or '—' }}</span>
+              </td>
+              <td>{{ item.shield_shape or '—' }}</td>
+              <td>
+                <div class="btn-row">
+                  <a class="btn btn-gold" href="{{ url_for('admin_edit_item', item_id=item.id) }}">✎ Edit</a>
+                  <a class="btn btn-blue" href="{{ url_for('detail', item_id=item.id) }}" target="_blank">↗ View</a>
+                  <form class="inline-form" method="POST" action="{{ url_for('admin_delete_item', item_id=item.id) }}"
+                        onsubmit="return confirm('Delete «{{ item.name }}»? This cannot be undone.')">
+                    <button class="btn btn-red" type="submit">✕ Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty">No items in the registry.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="panel" id="panel-users">
+      <div class="page-header">
+        <div>
+          <h2>Users</h2>
+          <p>Manage accounts, roles and API keys.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <span class="table-title">⚔ Roster — {{ users|length }} accounts</span>
+          <input class="search-box" type="text" placeholder="Filter users..." oninput="filterTable(this,'users-tbody')">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Username</th><th>Role</th><th>API Key</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            {% for user in users %}
+            <tr>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:0.8rem;">#{{ user.id }}</td>
+              <td>
+                <strong>{{ user.username }}</strong>
+                {% if user.id == g.user.id %}
+                  <span class="badge badge-gold" style="margin-left:0.4rem;">You</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if user.is_admin %}
+                  <span class="badge badge-gold">⚜ Admin</span>
+                {% else %}
+                  <span class="badge badge-dim">User</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="api-key-cell" title="{{ user.api_key }}">{{ user.api_key[:20] }}…</span>
+              </td>
+              <td>
+                <div class="btn-row">
+                  <!-- Toggle admin (can't self-demote) -->
+                  {% if user.id != g.user.id %}
+                  <form class="inline-form" method="POST" action="{{ url_for('admin_toggle_admin', user_id=user.id) }}"
+                        onsubmit="return confirm('{% if user.is_admin %}Revoke admin from{% else %}Grant admin to{% endif %} {{ user.username }}?')">
+                    <button class="btn {% if user.is_admin %}btn-red{% else %}btn-green{% endif %}" type="submit">
+                      {% if user.is_admin %}✕ Revoke{% else %}✦ Grant{% endif %}
+                    </button>
+                  </form>
+                  <!-- Reset API Key -->
+                  <form class="inline-form" method="POST" action="{{ url_for('admin_reset_api_key', user_id=user.id) }}"
+                        onsubmit="return confirm('Reset API key for {{ user.username }}? Their current key will stop working.')">
+                    <button class="btn btn-blue" type="submit">↺ Reset Key</button>
+                  </form>
+                  <!-- Delete user -->
+                  <form class="inline-form" method="POST" action="{{ url_for('admin_delete_user', user_id=user.id) }}"
+                        onsubmit="return confirm('DELETE user {{ user.username }}? All their items will also be deleted. This CANNOT be undone.')">
+                    <button class="btn btn-red" type="submit">✕ Delete</button>
+                  </form>
+                  {% else %}
+                  <span style="color:var(--text-muted);font-size:0.8rem;font-style:italic;">Protected</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="empty">No users found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ADD ITEM ── -->
+    <div class="panel" id="panel-add-item">
+      <div class="page-header">
+        <div>
+          <h2>Add Item</h2>
+          <p>Create a new coat of arms entry as an admin.</p>
+        </div>
+      </div>
+      <div class="form-card">
+        <form method="POST" action="{{ url_for('admin_add_item') }}">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Name *</label>
+              <input type="text" name="name" required placeholder="e.g. Kingdom of Northumbria">
+            </div>
+            <div class="form-group">
+              <label>Motto (Latin)</label>
+              <input type="text" name="motto_latin" placeholder="Deus et Patria">
+            </div>
+            <div class="form-group">
+              <label>Motto (English)</label>
+              <input type="text" name="motto_english" placeholder="God and Country">
+            </div>
+            <div class="form-group">
+              <label>Shield Shape</label>
+              <select name="shield_shape">
+                <option value="">— Select —</option>
+                <option>Heater</option>
+                <option>French</option>
+                <option>Swiss</option>
+                <option>Lozenge</option>
+                <option>Oval</option>
+                <option>Roundel</option>
+                <option>Baroque</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Colors (comma-separated)</label>
+              <input type="text" name="colors" placeholder="Or, Gules, Azure">
+            </div>
+            <div class="form-group">
+              <label>Designer</label>
+              <input type="text" name="designer" placeholder="Name of herald/designer">
+            </div>
+            <div class="form-group">
+              <label>Created At</label>
+              <input type="text" name="created_at" placeholder="e.g. 1348">
+            </div>
+            <div class="form-group full">
+              <label>Image URL</label>
+              <input type="text" name="image" placeholder="https://…">
+            </div>
+            <div class="form-group full">
+              <label>Description</label>
+              <textarea name="description" placeholder="Heraldic description…"></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Assign to User</label>
+              <select name="user_id">
+                <option value="">— Unassigned —</option>
+                {% for u in users %}
+                <option value="{{ u.id }}">{{ u.username }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Usage</label>
+              <div class="checkbox-row">
+                <label class="checkbox-label"><input type="checkbox" name="usage_official_documents"> Official Documents</label>
+                <label class="checkbox-label"><input type="checkbox" name="usage_flags"> Flags</label>
+                <label class="checkbox-label"><input type="checkbox" name="usage_seal"> Seal</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">✦ Create Item</button>
+            <a class="btn btn-gold" onclick="showPanel('items')">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    const nav = document.getElementById('nav-' + name);
+    if (nav) nav.classList.add('active');
+  }
+
+  function filterTable(input, tbodyId) {
+    const q = input.value.toLowerCase();
+    const rows = document.getElementById(tbodyId).querySelectorAll('tr');
+    rows.forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  // Auto-open panel based on hash
+  const hash = location.hash.replace('#','');
+  if (['overview','items','users','add-item'].includes(hash)) showPanel(hash);
+</script>
+</body>
+{% endblock %}

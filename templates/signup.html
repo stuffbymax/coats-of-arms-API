@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 400px; margin: 2rem auto; padding: 2rem; border: 1px solid #ccc; border-radius: 8px;">
+    <h2>Sign Up for an API Key</h2>
+    {% if error %}
+        <p style="color: red; font-weight: bold;">{{ error }}</p>
+    {% endif %}
+    <form method="POST">
+        <div style="margin-bottom: 1rem;">
+            <label style="display:block; margin-bottom: .5rem;">Username:</label>
+            <input type="text" name="username" required style="width: 100%; padding: .5rem;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <label style="display:block; margin-bottom: .5rem;">Password:</label>
+            <input type="password" name="password" required style="width: 100%; padding: .5rem;">
+        </div>
+        <button type="submit" style="padding: .5rem 1rem; cursor: pointer;">Sign Up</button>
+    </form>
+    <p style="margin-top: 1rem;">Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+</div>
+{% endblock %}
