@@ -1,22 +1,27 @@
 # CSS made by AI
 # Coats of Arms API repository — Flask + SQLite
-
 # the project
-[https://192.168.1.12:5000/](https://coats.zdislav.dpdns.org/)
-
+[https://coats.zdislav.dpdns.org/](https://coats.zdislav.dpdns.org/)
 A web app to collect, browse, and manage coats of arms for towns and countries.
-
 ## Setup
-
 ```bash
 pip install -r requirements.txt
 python app.py
 ```
-
 Then open http://127.0.0.1:5000
 
-## Features
+## Database Initialisation
+```bash
+flask --app app.py init-db
+```
+>This wipes all existing data and re-seeds from `data.json`.
 
+## Debug Mode
+```bash
+flask --app app.py run --debug
+```
+
+## Features
 - **Browse** all entries in a visual grid
 - **Search** by name
 - **Detail view** with image, description, colors, symbols, motto
@@ -26,12 +31,10 @@ Then open http://127.0.0.1:5000
 - **REST API** at `/api/items` and `/api/items/<id>`
 
 ## Database
-
 SQLite file `coats_of_arms.db` is auto-created on first run.  
 On first run, `data.json` is seeded into the database automatically.
 
 ## Schema
-
 ```
 coats_of_arms
 ├── id                      INTEGER PK AUTOINCREMENT
@@ -52,8 +55,7 @@ coats_of_arms
 ```
 
 ## API
-
 - `GET /api/items` — list all entries
 - `GET /api/items/<id>` — single entry detail
-
-
+- `more at [https://coats.zdislav.dpdns.org/docs](https://coats.zdislav.dpdns.org/docs)`
+```
