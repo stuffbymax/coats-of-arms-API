@@ -57,5 +57,4 @@ coats_of_arms
 ## API
 - `GET /api/items` — list all entries
 - `GET /api/items/<id>` — single entry detail
-- `more at [https://coats.zdislav.dpdns.org/docs](https://coats.zdislav.dpdns.org/docs)`
-```
+- `more at` [https://coats.zdislav.dpdns.org/docs](https://coats.zdislav.dpdns.org/docs)
