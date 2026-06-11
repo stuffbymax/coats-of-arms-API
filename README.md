@@ -1,6 +1,9 @@
 # CSS made by AI
 # Coats of Arms API repository — Flask + SQLite
 
+# the project
+http://192.168.1.12:5000/
+
 A web app to collect, browse, and manage coats of arms for towns and countries.
 
 ## Setup
@@ -52,3 +55,5 @@ coats_of_arms
 
 - `GET /api/items` — list all entries
 - `GET /api/items/<id>` — single entry detail
+
+
