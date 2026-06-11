@@ -2,7 +2,7 @@
 # Coats of Arms API repository — Flask + SQLite
 
 # the project
-http://192.168.1.12:5000/
+[https://192.168.1.12:5000/](https://coats.zdislav.dpdns.org/)
 
 A web app to collect, browse, and manage coats of arms for towns and countries.
 
